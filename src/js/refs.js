@@ -4,4 +4,6 @@ export const refs = {
     body: document.querySelector("body"),
   themeToggleBtn: document.querySelector('.theme-toggle-btn'),
   categoriesList: document.querySelector('.categories'),
+  productsList: document.querySelector('.products'),
 };
+

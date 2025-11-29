@@ -1,5 +1,28 @@
 import { refs } from './refs';
-
+export async function renderProducts(products) {
+  const markup = products
+    .map(
+      ({
+        thumbnail,
+        id,
+        description,
+        title,
+        price,
+        category,
+        brand,
+      }) => `<li class="products__item" data-id="${id}">
+    <img class="products__image" src="${thumbnail}" alt="${description}"/>
+    <p class="products__title">${title}</p>
+    <p class="products__brand"><span class="products__brand--bold">Brand:${
+      brand || 'no brand'
+    }</span></p>
+    <p class="products__category">Category: ${category}</p>
+    <p class="products__price">Price: ${price}$</p>
+ </li>`
+    )
+    .join('');
+  refs.productsList.insertAdjacentHTML('beforeEnd', markup);
+}
 export function renderCategories(categories) {
   const categoryList = ['All', ...categories];
   const markup = categoryList
