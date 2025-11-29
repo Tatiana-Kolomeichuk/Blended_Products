@@ -7,10 +7,9 @@ export function saveToLS(key, value) {
 }
 
 export function loadFromLS(key) {
-    const data = localStorage.getItem(key);
-
     try {
-        return JSON.parse(data);
+         const data = localStorage.getItem(key);
+        return data?  JSON.parse(data):null;
     } catch (error) {
         console.error('Error loading from LocalStorage:', error);
         return null;
