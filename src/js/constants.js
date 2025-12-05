@@ -7,7 +7,6 @@ export const API_ENDPOINTS = {
   SEARCH: '/products/search',
 };
 export const ITEMS_PER_PAGE = 12;
-export let PAGE = 1;
 export const STATE = {
   QUERY: '',
   PAGE: 1,
