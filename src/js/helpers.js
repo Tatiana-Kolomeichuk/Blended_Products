@@ -7,7 +7,7 @@ export function toggleTheme(theme) {
   document.body.setAttribute('data-theme', theme);
   document.body.dataset.theme = theme;
 
-  refs.themeToggleBtn.innerHTML = theme === 'light' ? '🌙' : '☀️';
+  refs.themeToggleBtn.innerHTML = theme === 'light' ? '☀️' : '🌙';
   saveToLS(THEME_KEY, theme);
 }
 export function initTheme() {
