@@ -35,3 +35,35 @@ export function renderCategories(categories) {
     .join('');
   refs.categoriesList.innerHTML = markup;
 }
+export function renderModalProduct(product) {
+  
+  if (!refs.modalContainer) return;
+
+  const {
+    images = [],
+    thumbnail = '',
+    title = 'Unnamed product',
+    description = '—',
+    price = null,
+    brand = '',
+    category = '',
+    tags,
+  } = product || {};
+
+  const imgSrc = images[0] || thumbnail || '';
+  const finalTags = Array.isArray(tags) ? tags : [brand, category].filter(Boolean);
+  const tagsMarkup = finalTags.map(t => `<li>${String(t)}</li>`).join('');
+
+  refs.modalContainer.innerHTML = `
+    <img class="modal-product__img" src="${imgSrc}" alt="${title}" />
+    <div class="modal-product__content">
+      <p class="modal-product__title">${title}</p>
+      <ul class="modal-product__tags">${tagsMarkup}</ul>
+      <p class="modal-product__description">${description}</p>
+      <p class="modal-product__shipping-information">Shipping: —</p>
+      <p class="modal-product__return-policy">Return Policy: —</p>
+      <p class="modal-product__price">Price: $${price != null ? Number(price).toFixed(2) : '—'}</p>
+      <button class="modal-product__buy-btn" type="button">Buy</button>
+    </div>
+  `;
+}

@@ -7,10 +7,13 @@ import {
 } from './helpers';
 import {
   getCategories,
+  getProductById,
   getProducts,
   getProductsByCategory,
 } from './products-api';
-import { renderCategories, renderProducts } from './render-function';
+import { renderCategories, renderModalProduct, renderProducts } from './render-function';
+import { refs } from './refs';
+import { openModal } from './modal';
 
 export async function initHomePage() {
   try {
@@ -50,5 +53,20 @@ export async function handleCategoryClick(e) {
     } catch (err) {
       console.error(`Get products error: ${err}`);
     }
+  }
+}
+export async function onProductClick(e) {
+  const card = e.target.closest('.products__item');
+  if (!card || !refs.productsList.contains(card)) return;
+
+  const id = card.dataset.id;
+  if (!id) return;
+
+  try {
+    const product = await getProductById(id);
+    renderModalProduct(product);
+    openModal();
+  } catch (err) {
+    console.error('Не вдалося завантажити продукт:', err);
   }
 }

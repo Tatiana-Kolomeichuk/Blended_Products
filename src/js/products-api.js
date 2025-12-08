@@ -23,3 +23,9 @@ export async function getProductsByCategory(query, page) {
   );
   return data;
 }
+
+
+export async function getProductById(id) {
+  const { data } = await axios.get(`${API_ENDPOINTS.PRODUCTS_BY_ID}${id}`);
+  return data; 
+}
