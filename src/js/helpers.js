@@ -1,11 +1,22 @@
 import { refs } from './refs';
 import { STATE, ITEMS_PER_PAGE } from './constants';
+import { loadFromLS, saveToLS } from './storage';
+const THEME_KEY = 'theme';
 
 export function toggleTheme(theme) {
   document.body.setAttribute('data-theme', theme);
   document.body.dataset.theme = theme;
 
   refs.themeToggleBtn.innerHTML = theme === 'light' ? '🌙' : '☀️';
+  saveToLS(THEME_KEY, theme);
+}
+export function initTheme() {
+
+  const savedTheme = loadFromLS(THEME_KEY);
+  refs.themeToggleBtn.addEventListener('click', () => {
+    const newTheme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+    toggleTheme(newTheme);
+  });
 }
 
 export function clearProductsList() {
