@@ -6,5 +6,7 @@ export const refs = {
   categoriesList: document.querySelector('.categories'),
   productsList: document.querySelector('.products'),
   notFoundBlock: document.querySelector('div.not-found'),
-  modalContainer : document.querySelector('.modal-product')
+  modalContainer: document.querySelector('.modal-product'),
+  searchForm: document.querySelector('.search-form'),
+  loadMoreBtn: document.querySelector('.load-more-btn'),
 };

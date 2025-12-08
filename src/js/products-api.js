@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL, API_ENDPOINTS, ITEMS_PER_PAGE } from './constants';
+import { API_BASE_URL, API_ENDPOINTS, ITEMS_PER_PAGE, STATE } from './constants';
 axios.defaults.baseURL = API_BASE_URL;
 
 export async function getProducts(page) {
@@ -28,4 +28,12 @@ export async function getProductsByCategory(query, page) {
 export async function getProductById(id) {
   const { data } = await axios.get(`${API_ENDPOINTS.PRODUCTS_BY_ID}${id}`);
   return data; 
+}
+
+export async function searchProducts() {
+  const skip = (STATE.PAGE - 1) * ITEMS_PER_PAGE;
+  const response = await axios.get(
+    `${API_ENDPOINTS.SEARCH}?q=${STATE.QUERY}&limit=${ITEMS_PER_PAGE}&skip=${skip}`
+  );
+  return response.data;
 }

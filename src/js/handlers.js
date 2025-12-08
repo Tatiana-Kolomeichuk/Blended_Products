@@ -1,6 +1,9 @@
 import { STATE } from './constants';
 import {
+  canLoadMore,
+  clearActiveCategory,
   clearProductsList,
+  hideLoadMore,
   hideNotFoundBlock,
   showNotFoundBlock,
   updateActiveCategory,
@@ -10,6 +13,7 @@ import {
   getProductById,
   getProducts,
   getProductsByCategory,
+  searchProducts,
 } from './products-api';
 import { renderCategories, renderModalProduct, renderProducts } from './render-function';
 import { refs } from './refs';
@@ -69,4 +73,33 @@ export async function onProductClick(e) {
   } catch (err) {
     console.error('Не вдалося завантажити продукт:', err);
   }
+}
+export async function handleSearchForm(e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const queryCandidate = formData.get('searchValue').trim();
+  if (!queryCandidate) {
+    alert('type something');
+    return;
+  }
+
+  clearProductsList();
+  hideNotFoundBlock();
+  clearActiveCategory();
+  hideLoadMore();
+  STATE.QUERY = queryCandidate;
+  STATE.PAGE = 1;
+
+  try {
+    const { products, total } = await searchProducts(STATE.QUERY, STATE.PAGE);
+    if (!products?.length) {
+      showNotFoundBlock();
+    } else {
+      renderProducts(products);
+      canLoadMore(total);
+    }
+  } catch (err) {
+    console.error(`Get product error: ${err}`);
+  }
+  e.target.reset();
 }
