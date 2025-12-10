@@ -1,12 +1,16 @@
-import { STATE } from './constants';
+import { STATE,CART_KEY } from './constants';
 import {
   canLoadMore,
   clearActiveCategory,
   clearProductsList,
+  getCart,
   hideLoadMore,
   hideNotFoundBlock,
+  setCart,
   showNotFoundBlock,
   updateActiveCategory,
+  updateCartSummary,
+  updateNavCartCount,
 } from './helpers';
 import {
   getCategories,
@@ -17,7 +21,9 @@ import {
 } from './products-api';
 import { renderCategories, renderModalProduct, renderProducts } from './render-function';
 import { refs } from './refs';
-import { openModal } from './modal';
+import { onCartProductClick, openModal } from './modal';
+
+let currentProductId = null;
 
 export async function initHomePage() {
   try {
@@ -102,4 +108,119 @@ export async function handleSearchForm(e) {
     console.error(`Get product error: ${err}`);
   }
   e.target.reset();
+}
+
+//Card//
+
+export async function initCartPage() {
+  const ids = getCart(); 
+
+  if (!ids.length) {
+    refs.productsList.innerHTML = ''; 
+    refs.notFoundBlock.classList.add('not-found--visible');
+    updateCartSummary([]);
+    return;
+  }
+
+  refs.notFoundBlock.classList.remove('not-found--visible');
+
+  try {
+    const products = await Promise.all(ids.map(id => getProductById(id)));
+    refs.productsList.innerHTML = '';
+    await renderProducts(products);
+
+    updateCartSummary(products); 
+  } catch (error) {
+    console.error('Error loading cart products:', error);
+    refs.notFoundBlock.classList.add('not-found--visible');
+    updateCartSummary([]);
+  }
+}
+
+export function initModalButtonsHandlers() {
+  const wishlistBtn = document.querySelector('.modal-product__btn--wishlist');
+  const cartBtn = document.querySelector('.modal-product__btn--cart');
+
+  if (!wishlistBtn || !cartBtn) {
+    console.warn('Modal buttons not found in DOM');
+    return;
+  }
+
+  wishlistBtn.addEventListener('click', () => {
+    if (currentProductId == null) return;
+    const inWishlist = toggleWishlist(currentProductId);
+    wishlistBtn.textContent = inWishlist
+      ? 'Remove from Wishlist'
+      : 'Add to Wishlist';
+  });
+
+  cartBtn.addEventListener('click', async () => {
+    if (currentProductId == null) return;
+    console.log('Cart button clicked with id:', currentProductId);
+    const inCart = toggleCart(currentProductId);
+    cartBtn.textContent = inCart ? 'Remove from Cart' : 'Add to Cart';
+    await initCartPage();
+  });
+}
+
+export function onBuyProductsClick() {
+  const cart = getCart(); 
+
+  if (!cart.length) {
+    iziToast.info({
+      title: 'Empty',
+      message: 'Your cart is empty.',
+      position: 'topRight',
+    });
+    return;
+  }
+
+  iziToast.success({
+    title: 'Success',
+    message: 'You successfully purchased all products in the cart!',
+    position: 'topRight',
+  });
+
+  setCart([]); 
+  initCartPage(); 
+}
+// ---------- scroll-to-top ----------
+
+function initScrollTop() {
+  const scrollBtn = document.querySelector('.scroll-top-btn');
+  if (!scrollBtn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      scrollBtn.classList.remove('is-hidden');
+    } else {
+      scrollBtn.classList.add('is-hidden');
+    }
+  });
+
+  scrollBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  });
+}
+
+// ---------- init events ----------
+
+export function initCartEvents() {
+  
+  refs.productsList.addEventListener('click', onCartProductClick);
+
+  
+  const buyBtn = document.querySelector('.cart-summary__btn');
+  if (buyBtn) {
+    buyBtn.addEventListener('click', onBuyProductsClick);
+  }
+
+
+  initModalButtonsHandlers();
+
+
+  initScrollTop();
 }

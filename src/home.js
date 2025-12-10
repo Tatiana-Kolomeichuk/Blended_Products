@@ -3,6 +3,8 @@ import { handleCategoryClick, initHomePage, onProductClick,handleSearchForm} fro
 import { initTheme } from './js/helpers';
 import { closeModal, openModal } from './js/modal';
 import { refs } from './js/refs';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();       
