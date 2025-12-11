@@ -58,3 +58,18 @@ export function renderModalProduct(product) {
       </div>`;
   refs.modalContainer.innerHTML = markup;
 }
+
+
+//рендер інформації у кошику
+export function renderCardWishlist(items) {
+    const quantity = items.length;
+    refs.cartSummary.textContent = quantity;
+     
+    let total = 0;
+
+    for (const item of items) {
+        total += item.price;
+    };
+    
+    refs.cartSummaryPrice.textContent = total.toFixed(2);
+}

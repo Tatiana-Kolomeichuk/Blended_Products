@@ -1,6 +1,6 @@
 //Логіка сторінки Home
 import { handleCategoryClick, initHomePage, onProductClick,handleSearchForm} from './js/handlers';
-import { initTheme } from './js/helpers';
+import { initTheme, toggleTheme } from './js/helpers';
 import { closeModal, openModal } from './js/modal';
 import { refs } from './js/refs';
 import iziToast from 'izitoast';
@@ -14,3 +14,4 @@ refs.closeModalBtn.addEventListener('click', closeModal);
 refs.categoriesList.addEventListener('click', handleCategoryClick);
 refs.productsList.addEventListener('click', onProductClick);
 refs.searchForm.addEventListener('submit', handleSearchForm);
+refs.themeToggleBtn.addEventListener('click',toggleTheme );
