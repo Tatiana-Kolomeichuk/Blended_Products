@@ -1,23 +1,28 @@
 export const refs = {
-  closeModalBtn: document.querySelector('.modal__close-btn'),
-  modal: document.querySelector('.modal'),
-  body: document.querySelector('body'),
+  // --------- Головні елементи сторінок ---------
+  body: document.body,
   themeToggleBtn: document.querySelector('.theme-toggle-btn'),
+  searchForm: document.querySelector('.search-form'),
   categoriesList: document.querySelector('.categories'),
   productsList: document.querySelector('.products'),
-  notFoundBlock: document.querySelector('div.not-found'),
-  modalContainer: document.querySelector('.modal-product'),
-  searchForm: document.querySelector('.search-form'),
-  loadMoreBtn: document.querySelector('.load-more-btn'),
-  wishlistCountSpan: document.querySelector('[data-wishlist-count]'),
-  cartCountSpan: document.querySelector('[data-cart-count]'),
+
+  // --------- Кошик ---------
+  buyBtnCart: document.querySelector('.cart-summary__btn'),
   cartSummary: document.querySelector('[data-count]'),
   cartSummaryPrice: document.querySelector('[data-price]'),
-  cartProductList: document.querySelector('.products'),
+
+  // --------- Модалка ---------
+  modal: document.querySelector('.modal'),
+  modalContainer: document.querySelector('.modal-product'),
+  modalCloseBtn: document.querySelector('.modal__close-btn'),
   addToCartModalBtn: document.querySelector('.modal-product__btn--cart'),
   addTowishlistBtn: document.querySelector('.modal-product__btn--wishlist'),
-  buyBtnCart: document.querySelector('.cart-summary__btn'),
-  modalCloseBtn: document.querySelector('.modal__close-btn'),
+
+  // --------- Індикатори ---------
   cartCountSpan: document.querySelector('[data-cart-count]'),
   wishlistCountSpan: document.querySelector('[data-wishlist-count]'),
+
+  // --------- Стани / службові блоки ---------
+  notFoundBlock: document.querySelector('.not-found'),
+  loadMoreBtn: document.querySelector('.load-more-btn'),
 };

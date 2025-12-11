@@ -3,7 +3,6 @@ import {
   handleBtnClose,
   handleBtnSearch,
   handleBuyBtnClick,
-  handleBuyItemClick,
   handleCartItemsLoad,
   handleItemClick,
   handleModalBtnAdd,
@@ -14,22 +13,23 @@ import { initTheme } from "./js/helpers";
 import { closeModal } from "./js/modal";
 import { refs } from "./js/refs";
 
+
+
+
+
+
 // ----------------- DOMContentLoaded -----------------
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Cart page loaded");
 
-  // 1. Ініціалізуємо тему
-  initTheme();
-
-  // 2. Завантажуємо товари кошика
+  //Завантажуємо товари кошика
   handleCartItemsLoad();
 });
 
 // ----------------- Клік по товарах у списку кошика -----------------
 
 // ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
-refs.cartProductList.addEventListener("click", handleItemClick);
+refs.productsList.addEventListener("click", handleItemClick);
 
 // ----------------- ПОКУПКА ВСІХ ТОВАРІВ -----------------
 
@@ -50,7 +50,7 @@ refs.addToCartModalBtn.addEventListener("click", handleModalBtnAdd);
 refs.addTowishlistBtn.addEventListener("click", handleWishlistAdd);
 
 // Клік по кнопці Buy у модалці (купити один товар)
-refs.modal.addEventListener("click", handleBuyItemClick);
+refs.modal.addEventListener("click", handleItemClick);
 
 // ----------------- ПОШУК З КОШИКА -----------------
 

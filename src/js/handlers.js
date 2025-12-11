@@ -11,7 +11,7 @@ import { loadFromLS, saveToLS } from './storage';
 // let page = 1;
 // let query;
 // let category;
-let cartItems = (loadFromLS('cartItems') || []).map(Number);
+
 let wishlistItems = (loadFromLS('wishlist') || []).map(Number);
 
 // Ініціалізація сторінки Home
@@ -110,34 +110,31 @@ export async function handleSearchForm(e) {
 
 //------------- Завантаження сторінки Card ---------------------------------
 export async function handleCartItemsLoad() {
-  cartItems = (loadFromLS('cartItems') || []).map(Number);
-  initTheme();
+  const raw = loadFromLS('cartItems') || [];
+  const cartIds = Array.isArray(raw) ? raw : [];
+  const ids = cartIds.map(x => Number(x)).filter(Number.isFinite);
 
-  console.log("Cart IDs from LS:", cartItems);
+  console.log("Cart IDs from LS:", ids);
 
-  if (!cartItems.length) {
-    refs.cartProductList.innerHTML = '';
-    refs.notFoundBlock.classList.add('not-found--visible');
+  if (!ids.length) {
+    if (refs.productsList) refs.productsList.innerHTML = '';
+    if (refs.notFoundBlock) refs.notFoundBlock.classList.add('not-found--visible');
     renderCardWishlist([]);
-    countCartItems();
+    countCartItems(0);                
     return;
   }
 
-  refs.notFoundBlock.classList.remove('not-found--visible');
+  if (refs.notFoundBlock) refs.notFoundBlock.classList.remove('not-found--visible');
 
   try {
-    const requests = cartItems.map(id => getProductById(id));
-    const products = await Promise.all(requests);
-
-    console.log("Loaded cart products:", products);
+    const products = await Promise.all(ids.map(id => getProductById(id)));
 
     clearProductsList();
     renderProducts(products);
 
-    countCartItems();
+    countCartItems(ids.length);     
     countWishlistItems();
     renderCardWishlist(products);
-
   } catch (error) {
     console.error("Error loading cart items:", error);
   }
@@ -152,16 +149,10 @@ export function countWishlistItems() {
 }
 
 //---------------- COUNT CART ITEMS ---------------------------
-export function countCartItems() {
-    const quantity = cartItems.length;
-    refs.cartCountSpan.textContent = quantity;
-}
-
-//------------- BUY BTN CLICK ----------------------
-export function handleBuyBtnClick() {
-  cartItems = [];
-  saveToLS('cartItems', cartItems);
-  handleCartItemsLoad();
+export function countCartItems(qty = 0) {
+  if (refs.cartCountSpan) {
+    refs.cartCountSpan.textContent = String(qty);
+  }
 }
 
 //------------------- OPEN MODAL ----------------------
@@ -204,30 +195,28 @@ export function handleBtnClose() {
 
 //------------------ ADD TO CART -------------------------------
 export function handleModalBtnAdd(e) {
-  const actions = e.target.closest('.modal-product__actions');
-  if (!actions) return;
-
-  const contentEl = refs.modalContainer.querySelector('[data-id]');
-  if (!contentEl) {
-    console.warn("No product ID found in modal");
-    return;
-  }
+  const contentEl = refs.modalContainer?.querySelector('.modal-product__content[data-id]');
+  if (!contentEl) return;
 
   const id = Number(contentEl.dataset.id);
-  console.log("Modal toggling id:", id);
+  if (!Number.isFinite(id)) return;
 
-  if (cartItems.includes(id)) {
-    cartItems = cartItems.filter(el => el !== id);
-    e.target.textContent = "Add to cart";
+  // читаємо й оновлюємо LS
+  const raw = loadFromLS('cartItems') || [];
+  let ids = (Array.isArray(raw) ? raw : []).map(Number).filter(Number.isFinite);
+
+  const btn = e.target.closest('.modal-product__btn--cart');
+
+  if (ids.includes(id)) {
+    ids = ids.filter(x => x !== id);
+    if (btn) btn.textContent = 'Add to Cart';
   } else {
-    cartItems.push(id);
-    e.target.textContent = "Remove from cart";
+    ids.push(id);
+    if (btn) btn.textContent = 'Remove from Cart';
   }
 
-  saveToLS('cartItems', cartItems);
-  countCartItems();
-
-  console.log("Cart after toggle:", cartItems);
+  saveToLS('cartItems', ids);
+  countCartItems(ids.length);              
 }
 //--------------- ADD TO WISH PRODUCT ----------------------
 export function handleWishlistAdd(e) {
@@ -260,22 +249,12 @@ export function handleWishlistAdd(e) {
   console.log('Wishlist after:', wishlistItems);
 }
 //----------------- BUY PRODUCT -----------------------------
-export function handleBuyItemClick(e) {
-  if (e.target.textContent !== "Buy") return;
-
-  const block = e.target.closest('.modal-product__content');
-  if (!block) return;
-
-  const id = Number(block.dataset.id);
-
-  cartItems = cartItems.filter(el => el !== id);
-  saveToLS('cartItems', cartItems);
-
-  refs.addToCartModalBtn.textContent = "Add to cart";
-
+export function handleBuyBtnClick() {
+  const ids = [];                           
+  saveToLS('cartItems', ids);
+  countCartItems(0);                        
   handleCartItemsLoad();
 }
-
 //-------- SEARCH ---------------------
 export function handleBtnSearch(e) {
     e.preventDefault()
