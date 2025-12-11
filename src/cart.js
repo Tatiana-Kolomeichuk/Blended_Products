@@ -1,41 +1,57 @@
-import { handleBtnClose, handleBtnSearch, handleBuyBtnClick, handleBuyItemClick, handleCartItemsLoad, handleItemClick, handleModalBtnAdd, handleWishlistAdd } from "./js/handlers";
-import { toggleTheme } from "./js/helpers";
+
+import {
+  handleBtnClose,
+  handleBtnSearch,
+  handleBuyBtnClick,
+  handleBuyItemClick,
+  handleCartItemsLoad,
+  handleItemClick,
+  handleModalBtnAdd,
+  handleWishlistAdd,
+} from "./js/handlers";
+
+import { initTheme } from "./js/helpers";
 import { closeModal } from "./js/modal";
-import { refs } from './refs';
+import { refs } from "./js/refs";
 
+// ----------------- DOMContentLoaded -----------------
 
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Cart page loaded");
 
+  // 1. Ініціалізуємо тему
+  initTheme();
 
-//Loading page//
-document.addEventListener('DOMContentLoaded', handleCartItemsLoad)
+  // 2. Завантажуємо товари кошика
+  handleCartItemsLoad();
+});
 
-//ПЕРЕМИКАННЯ ТЕМИ
-refs.themeToggleBtn.addEventListener('click',toggleTheme );
+// ----------------- Клік по товарах у списку кошика -----------------
 
 // ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
-refs.cartProductList.addEventListener('click', handleItemClick);
+refs.cartProductList.addEventListener("click", handleItemClick);
 
-//тут при додаванні чи видаленні товару у самій корзині, ще додатково викликаємо завантаження сторінки
-//щоб товар на фоні модалки відмальовувався правильно
-refs.addToCartModalBtn.addEventListener('click', handleCartItemsLoad);
+// ----------------- ПОКУПКА ВСІХ ТОВАРІВ -----------------
 
-//ПОКУПКА ТОВАРІВ
-refs.buyBtnCart.addEventListener('click', handleBuyBtnClick);
+refs.buyBtnCart.addEventListener("click", handleBuyBtnClick);
 
-//МОДАЛКА
-//ці події на всіх сторінках одинакові
-//оскільки на всіх сторінках модальне вікно товару і дії в ньому одинакові
-refs.modalCloseBtn.addEventListener('click', handleBtnClose);
-refs.modal.addEventListener('click', closeModal);
-refs.addToCartModalBtn.addEventListener('click', handleModalBtnAdd);
-refs.addTowishlistBtn.addEventListener('click', handleWishlistAdd);
-refs.modal.addEventListener('click', handleBuyItemClick);
-//ПЕРЕМИКАННЯ ТЕМИ
-refs.themeToggleBtn.addEventListener('click',toggleTheme);
-//
+// ----------------- МОДАЛКА -----------------
 
+// Закрити по хрестику
+refs.modalCloseBtn.addEventListener("click", handleBtnClose);
 
-//ПОШУК З КОШИКА
-//робимо подію для пошуку і перекидання на головну сторінку
-//така сама подія і у wishlst
-refs.searchForm.addEventListener('submit', handleBtnSearch);
+// Закрити по бекдропу
+refs.modal.addEventListener("click", closeModal);
+
+// Кнопка ADD TO CART / REMOVE FROM CART в модалці
+refs.addToCartModalBtn.addEventListener("click", handleModalBtnAdd);
+
+// Кнопка ADD TO WISHLIST / REMOVE FROM WISHLIST в модалці
+refs.addTowishlistBtn.addEventListener("click", handleWishlistAdd);
+
+// Клік по кнопці Buy у модалці (купити один товар)
+refs.modal.addEventListener("click", handleBuyItemClick);
+
+// ----------------- ПОШУК З КОШИКА -----------------
+
+refs.searchForm.addEventListener("submit", handleBtnSearch);

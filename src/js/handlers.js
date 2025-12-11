@@ -1,18 +1,18 @@
 import { STATE } from './constants';
 import { canLoadMore, clearActiveCategory, clearProductsList, hideLoadMore, hideNotFoundBlock, initTheme, showNotFoundBlock,updateActiveCategory, } from './helpers';
 import { getCategories, getProductById, getProducts, getProductsByCategory, searchProducts, } from './products-api';
-import { renderCategories, renderModalProduct, renderProducts } from './render-function';
+import { renderCardWishlist, renderCategories, renderModalProduct, renderProducts } from './render-function';
 import { refs } from './refs';
 import { closeModal, onEscapePress, openModal } from './modal';
 import { loadFromLS, saveToLS } from './storage';
 
 
-let totalPages;
-let page = 1;
-let query;
-let category;
-let cartItems = loadFromLS('cartItems') || [];
-let wishlistItems = loadFromLS('wishlist') || [];
+// let totalPages;
+// let page = 1;
+// let query;
+// let category;
+let cartItems = (loadFromLS('cartItems') || []).map(Number);
+let wishlistItems = (loadFromLS('wishlist') || []).map(Number);
 
 // Ініціалізація сторінки Home
 export async function initHomePage() {
@@ -110,30 +110,46 @@ export async function handleSearchForm(e) {
 
 //------------- Завантаження сторінки Card ---------------------------------
 export async function handleCartItemsLoad() {
-    const cartItems = loadFromLS('cartItems') || [];
-    initTheme();
-   
-    try {
-        const response = cartItems.map(id => getProductById(id));
-        const result = await Promise.all(response);
-        const markup = renderProducts(result);
-        refs.cartProductList.innerHTML = markup;
-        countWishlistItems();
-        countCartItems();
-    
-        renderCardWishlist(result);
-    } catch (error) {
-        console.log(error);
-    } 
-};
+  cartItems = (loadFromLS('cartItems') || []).map(Number);
+  initTheme();
 
+  console.log("Cart IDs from LS:", cartItems);
+
+  if (!cartItems.length) {
+    refs.cartProductList.innerHTML = '';
+    refs.notFoundBlock.classList.add('not-found--visible');
+    renderCardWishlist([]);
+    countCartItems();
+    return;
+  }
+
+  refs.notFoundBlock.classList.remove('not-found--visible');
+
+  try {
+    const requests = cartItems.map(id => getProductById(id));
+    const products = await Promise.all(requests);
+
+    console.log("Loaded cart products:", products);
+
+    clearProductsList();
+    renderProducts(products);
+
+    countCartItems();
+    countWishlistItems();
+    renderCardWishlist(products);
+
+  } catch (error) {
+    console.error("Error loading cart items:", error);
+  }
+}
 
 //---------------- COUNT WISH ITEMS ---------------------------
 export function countWishlistItems() {
-    const quantity = wishlistItems.length;
+  const quantity = wishlistItems.length;
+  if (refs.wishlistCountSpan) {
     refs.wishlistCountSpan.textContent = quantity;
+  }
 }
-
 
 //---------------- COUNT CART ITEMS ---------------------------
 export function countCartItems() {
@@ -141,39 +157,43 @@ export function countCartItems() {
     refs.cartCountSpan.textContent = quantity;
 }
 
-
 //------------- BUY BTN CLICK ----------------------
 export function handleBuyBtnClick() {
-    cartItems = [];
-    saveToLS('cartItems', cartItems);
-    
-    handleCartItemsLoad();
+  cartItems = [];
+  saveToLS('cartItems', cartItems);
+  handleCartItemsLoad();
 }
 
 //------------------- OPEN MODAL ----------------------
 export async function handleItemClick(e) {
-    const liElem = e.target.closest('li');
-    if (!liElem) return;
+  const liElem = e.target.closest('li.products__item');
+  if (!liElem) return;
 
-    const id = liElem.dataset.id;
-    
-    const response = await getProductById(id);
-    renderModalProduct(response);
+  const id = Number(liElem.dataset.id);
+  if (!id) return;
+
+  try {
+    const product = await getProductById(id);
+    renderModalProduct(product);
     openModal();
-        
+
+    // текст кнопок у модалці
     if (cartItems.includes(id)) {
-        refs.addToCartModalBtn.textContent = 'Remove from cart';   
+      refs.addToCartModalBtn.textContent = 'Remove from cart';
     } else {
-        refs.addToCartModalBtn.textContent = 'Add to cart';
+      refs.addToCartModalBtn.textContent = 'Add to cart';
     }
 
     if (wishlistItems.includes(id)) {
-        refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
+      refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
     } else {
-        refs.addTowishlistBtn.textContent = 'Add to Wishlist';
+      refs.addTowishlistBtn.textContent = 'Add to Wishlist';
     }
 
-    onEscapePress()
+    onEscapePress();
+  } catch (error) {
+    console.error('Error opening product modal:', error);
+  }
 }
 
 export function handleBtnClose() {
@@ -184,60 +204,77 @@ export function handleBtnClose() {
 
 //------------------ ADD TO CART -------------------------------
 export function handleModalBtnAdd(e) {
-    const actions = e.target.closest('.modal-product__actions');
-    const productElem = actions.previousElementSibling;
+  const actions = e.target.closest('.modal-product__actions');
+  if (!actions) return;
 
-    const contentEl = productElem.querySelector('[data-id]');
-    const id = contentEl.dataset.id;
+  const contentEl = refs.modalContainer.querySelector('[data-id]');
+  if (!contentEl) {
+    console.warn("No product ID found in modal");
+    return;
+  }
 
+  const id = Number(contentEl.dataset.id);
+  console.log("Modal toggling id:", id);
 
-    if (cartItems.includes(id)) {
-        e.target.textContent = 'Add to cart';
-        cartItems = cartItems.filter(el => el != id);
-    } else {
-        e.target.textContent = 'Remove from cart';
-        cartItems.push(id);
-    }
+  if (cartItems.includes(id)) {
+    cartItems = cartItems.filter(el => el !== id);
+    e.target.textContent = "Add to cart";
+  } else {
+    cartItems.push(id);
+    e.target.textContent = "Remove from cart";
+  }
 
-   
-    saveToLS('cartItems', cartItems);
-    countCartItems();
+  saveToLS('cartItems', cartItems);
+  countCartItems();
+
+  console.log("Cart after toggle:", cartItems);
 }
-
 //--------------- ADD TO WISH PRODUCT ----------------------
 export function handleWishlistAdd(e) {
-    const actions = e.target.closest('.modal-product__actions');
-    const productElem = actions.previousElementSibling;
+  const actions = e.target.closest('.modal-product__actions');
+  if (!actions) return;
 
-    const contentEl = productElem.querySelector('[data-id]');
-    const id = contentEl.dataset.id;
+  const productElem = actions.previousElementSibling;
+  if (!productElem) return;
 
-    if (wishlistItems.includes(id)) {
-        refs.addTowishlistBtn.textContent = 'Add to Wishlist';
-        wishlistItems = wishlistItems.filter(el => el !== id);
-    } else {
-        refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
-        wishlistItems.push(id);
-    };
+  const contentEl = productElem.querySelector('[data-id]');
+  if (!contentEl) return;
 
-    saveToLS('wishlist', wishlistItems)
-    countWishlistItems();
+  const id = Number(contentEl.dataset.id);
+  if (!id) return;
+
+  console.log('Wishlist toggle id:', id);
+  console.log('Wishlist before:', wishlistItems);
+
+  if (wishlistItems.includes(id)) {
+    refs.addTowishlistBtn.textContent = 'Add to Wishlist';
+    wishlistItems = wishlistItems.filter(el => el !== id);
+  } else {
+    refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
+    wishlistItems.push(id);
+  }
+
+  saveToLS('wishlist', wishlistItems);
+  countWishlistItems();
+
+  console.log('Wishlist after:', wishlistItems);
 }
-
 //----------------- BUY PRODUCT -----------------------------
 export function handleBuyItemClick(e) {
-    if (e.target.textContent !== 'Buy') return;
+  if (e.target.textContent !== "Buy") return;
 
-    const divEl = e.target.closest('div');
-    const id = divEl.dataset.id;
+  const block = e.target.closest('.modal-product__content');
+  if (!block) return;
 
-    cartItems = cartItems.filter(el => el != id);
-    refs.addToCartModalBtn.textContent = 'Add to cart';
+  const id = Number(block.dataset.id);
 
-    saveToLS('cartItems', cartItems);
-    handleCartItemsLoad();
+  cartItems = cartItems.filter(el => el !== id);
+  saveToLS('cartItems', cartItems);
+
+  refs.addToCartModalBtn.textContent = "Add to cart";
+
+  handleCartItemsLoad();
 }
-
 
 //-------- SEARCH ---------------------
 export function handleBtnSearch(e) {

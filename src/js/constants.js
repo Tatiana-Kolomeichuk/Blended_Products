@@ -11,7 +11,5 @@ export const STATE = {
   QUERY: '',
   PAGE: 1,
 };
-export const THEME_KEY = 'theme';
-export const CART_KEY = 'cart';
-export const WISHLIST_KEY = 'wishlist';
+
 

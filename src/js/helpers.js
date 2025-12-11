@@ -1,5 +1,5 @@
 import { refs } from './refs';
-import { STATE, ITEMS_PER_PAGE, THEME_KEY} from './constants';
+import { STATE, ITEMS_PER_PAGE} from './constants';
 import { loadFromLS, saveToLS } from './storage';
 
 
@@ -7,12 +7,17 @@ import { loadFromLS, saveToLS } from './storage';
 
 //Перемикання теми//
 export function toggleTheme(theme) {
-  document.body.setAttribute('data-theme', theme);
-  document.body.dataset.theme = theme;
-
-  refs.themeToggleBtn.textContent = theme === 'light' ? '☀️' : '🌙';
-  saveToLS(THEME_KEY, theme);
+  if (document.body.hasAttribute('data-theme')) {
+        document.body.removeAttribute('data-theme');
+        refs.themeToggleBtn.textContent = '☀️';
+        saveToLS('theme', 'light');
+    } else {
+        document.body.setAttribute('data-theme', 'dark');
+        refs.themeToggleBtn.textContent = '🌙';
+        saveToLS('theme', 'dark');
+    }
 }
+
 
 // Ініціалізація теми//
 export function initTheme() {
