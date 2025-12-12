@@ -1,5 +1,5 @@
 //Логіка сторінки Home
-import { handleCategoryClick, initHomePage, onProductClick,handleSearchForm} from './js/handlers';
+import { handleCategoryClick, initHomePage, onProductClick,handleSearchForm, handleCartItemsLoad, handleModalBtnAdd, handleWishlistAdd, handleItemClick} from './js/handlers';
 import { initTheme, toggleTheme } from './js/helpers';
 import { closeModal, openModal } from './js/modal';
 import { refs } from './js/refs';
@@ -15,3 +15,15 @@ refs.categoriesList.addEventListener('click', handleCategoryClick);
 refs.productsList.addEventListener('click', onProductClick);
 refs.searchForm.addEventListener('submit', handleSearchForm);
 refs.themeToggleBtn.addEventListener('click',toggleTheme );
+
+
+
+// Кнопка ADD TO CART / REMOVE FROM CART в модалці
+refs.addToCartModalBtn.addEventListener("click", handleModalBtnAdd);
+
+// Кнопка ADD TO WISHLIST / REMOVE FROM WISHLIST в модалці
+refs.addTowishlistBtn.addEventListener("click", handleWishlistAdd);
+
+
+// Клік по кнопці Buy у модалці (купити один товар)
+refs.modal.addEventListener("click", handleItemClick);

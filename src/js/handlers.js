@@ -7,12 +7,14 @@ import { closeModal, onEscapePress, openModal } from './modal';
 import { loadFromLS, saveToLS } from './storage';
 
 
-// let totalPages;
-// let page = 1;
-// let query;
-// let category;
+let totalPages;
+let page = 1;
+let query;
+let category;
+let productId = null;
+let wishlistItems = loadFromLS('wishlist') || [];
 
-let wishlistItems = (loadFromLS('wishlist') || []).map(Number);
+
 
 // Ініціалізація сторінки Home
 export async function initHomePage() {
@@ -142,9 +144,11 @@ export async function handleCartItemsLoad() {
 
 //---------------- COUNT WISH ITEMS ---------------------------
 export function countWishlistItems() {
-  const quantity = wishlistItems.length;
+  const wish = loadFromLS('wishlist') || [];
+  const quantity = wish.length;
+
   if (refs.wishlistCountSpan) {
-    refs.wishlistCountSpan.textContent = quantity;
+    refs.wishlistCountSpan.textContent = String(quantity);
   }
 }
 
@@ -195,59 +199,43 @@ export function handleBtnClose() {
 
 //------------------ ADD TO CART -------------------------------
 export function handleModalBtnAdd(e) {
-  const contentEl = refs.modalContainer?.querySelector('.modal-product__content[data-id]');
-  if (!contentEl) return;
+  // читаємо card з LS
+  let raw = loadFromLS('card') || [];
 
-  const id = Number(contentEl.dataset.id);
-  if (!Number.isFinite(id)) return;
+  const btn = e.target;
 
-  // читаємо й оновлюємо LS
-  const raw = loadFromLS('cartItems') || [];
-  let ids = (Array.isArray(raw) ? raw : []).map(Number).filter(Number.isFinite);
 
-  const btn = e.target.closest('.modal-product__btn--cart');
-
-  if (ids.includes(id)) {
-    ids = ids.filter(x => x !== id);
+  // toggle wishlist
+  if (raw.includes(productId)) {
+    raw = raw.filter(x => x !== productId);
     if (btn) btn.textContent = 'Add to Cart';
   } else {
-    ids.push(id);
+    raw.push(productId);
     if (btn) btn.textContent = 'Remove from Cart';
   }
 
-  saveToLS('cartItems', ids);
-  countCartItems(ids.length);              
+  // зберігаємо
+  saveToLS('card', raw);
+  countCartItems(raw.length);
 }
 //--------------- ADD TO WISH PRODUCT ----------------------
 export function handleWishlistAdd(e) {
-  const actions = e.target.closest('.modal-product__actions');
-  if (!actions) return;
-
-  const productElem = actions.previousElementSibling;
-  if (!productElem) return;
-
-  const contentEl = productElem.querySelector('[data-id]');
-  if (!contentEl) return;
-
-  const id = Number(contentEl.dataset.id);
-  if (!id) return;
-
-  console.log('Wishlist toggle id:', id);
-  console.log('Wishlist before:', wishlistItems);
-
-  if (wishlistItems.includes(id)) {
-    refs.addTowishlistBtn.textContent = 'Add to Wishlist';
-    wishlistItems = wishlistItems.filter(el => el !== id);
+  let wish = loadFromLS('wishlist') || [];
+  
+  const wishBtn = e.target;
+  // toggle wishlist
+  if (wish.includes(productId)) {
+    wish = wish.filter(x => x !== productId);
+    wishBtn.textContent = 'Add to Wishlist';
   } else {
-    refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
-    wishlistItems.push(id);
+    wish.push(productId);
+    wishBtn.textContent = 'Remove from Wishlist';
   }
 
-  saveToLS('wishlist', wishlistItems);
-  countWishlistItems();
-
-  console.log('Wishlist after:', wishlistItems);
+  saveToLS('wishlist',wish);
+  countWishlistItems(wish.length);
 }
+
 //----------------- BUY PRODUCT -----------------------------
 export function handleBuyBtnClick() {
   const ids = [];                           
