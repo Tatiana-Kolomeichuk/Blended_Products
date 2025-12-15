@@ -245,3 +245,15 @@ export function handleBtnSearch(e) {
 
     saveToLS('inputValue', input);    
 }
+export function handleBuyItemClick(e) {
+    if (e.target.textContent !== 'Buy') return;
+
+    const divEl = e.target.closest('div');
+    const id = divEl.dataset.id;
+
+    cartItems = cartItems.filter(el => el != id);
+    refs.addToCartModalBtn.textContent = 'Add to cart';
+
+    saveToLS('cartItems', cartItems);
+    handleCartItemsLoad();
+}
