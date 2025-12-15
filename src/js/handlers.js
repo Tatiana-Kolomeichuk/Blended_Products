@@ -1,7 +1,7 @@
 import { STATE } from './constants';
 import { canLoadMore, clearActiveCategory, clearProductsList, hideLoadMore, hideNotFoundBlock, initTheme, showNotFoundBlock,updateActiveCategory, } from './helpers';
 import { getCategories, getProductById, getProducts, getProductsByCategory, searchProducts, } from './products-api';
-import { renderCardWishlist, renderCategories, renderModalProduct, renderProducts } from './render-function';
+import {  productsTemplate, renderCardWishlist, renderCategories, renderModalProduct, renderProducts } from './render-function';
 import { refs } from './refs';
 import { closeModal, onEscapePress, openModal } from './modal';
 import { loadFromLS, saveToLS } from './storage';
@@ -13,7 +13,8 @@ let query;
 let category;
 let productId = null;
 let wishlistItems = loadFromLS('wishlist') || [];
-
+ const CART_KEY = 'cartItems';
+const WISHLIST_KEY = 'wishlist';
 
 
 // Ініціалізація сторінки Home
@@ -71,6 +72,7 @@ export async function onProductClick(e) {
   if (!id) return;
 
   try {
+    productId = id;
     const product = await getProductById(id);
     renderModalProduct(product);
     openModal();
@@ -111,34 +113,26 @@ export async function handleSearchForm(e) {
 //!============================= CART PAGE ================================
 
 //------------- Завантаження сторінки Card ---------------------------------
+
+//------------- LOAD CART PAGE ---------------------------------
 export async function handleCartItemsLoad() {
-  const raw = loadFromLS('cartItems') || [];
-  const cartIds = Array.isArray(raw) ? raw : [];
-  const ids = cartIds.map(x => Number(x)).filter(Number.isFinite);
-
-  console.log("Cart IDs from LS:", ids);
-
-  if (!ids.length) {
-    if (refs.productsList) refs.productsList.innerHTML = '';
-    if (refs.notFoundBlock) refs.notFoundBlock.classList.add('not-found--visible');
-    renderCardWishlist([]);
-    countCartItems(0);                
-    return;
-  }
-
-  if (refs.notFoundBlock) refs.notFoundBlock.classList.remove('not-found--visible');
+  const cartItems = loadFromLS('cartItems') || [];
 
   try {
-    const products = await Promise.all(ids.map(id => getProductById(id)));
+    const products = await Promise.all(
+      cartItems.map(id => getProductById(Number(id)))
+    );
 
-    clearProductsList();
-    renderProducts(products);
+    refs.productsList.innerHTML = productsTemplate(products);
 
-    countCartItems(ids.length);     
+    // counters
+    countCartItems(cartItems.length);
     countWishlistItems();
+
+    // summary
     renderCardWishlist(products);
   } catch (error) {
-    console.error("Error loading cart items:", error);
+    console.log(error);
   }
 }
 
@@ -199,13 +193,11 @@ export function handleBtnClose() {
 
 //------------------ ADD TO CART -------------------------------
 export function handleModalBtnAdd(e) {
-  // читаємо card з LS
-  let raw = loadFromLS('card') || [];
+  if (productId === null) return; // ⬅️ захист
 
+  let raw = loadFromLS('cartItems') || [];
   const btn = e.target;
 
-
-  // toggle wishlist
   if (raw.includes(productId)) {
     raw = raw.filter(x => x !== productId);
     if (btn) btn.textContent = 'Add to Cart';
@@ -214,16 +206,16 @@ export function handleModalBtnAdd(e) {
     if (btn) btn.textContent = 'Remove from Cart';
   }
 
-  // зберігаємо
-  saveToLS('card', raw);
+  saveToLS('cartItems', raw);
   countCartItems(raw.length);
 }
 //--------------- ADD TO WISH PRODUCT ----------------------
 export function handleWishlistAdd(e) {
+  if (productId === null) return; // ⬅️ захист
+
   let wish = loadFromLS('wishlist') || [];
-  
   const wishBtn = e.target;
-  // toggle wishlist
+
   if (wish.includes(productId)) {
     wish = wish.filter(x => x !== productId);
     wishBtn.textContent = 'Add to Wishlist';
@@ -232,7 +224,7 @@ export function handleWishlistAdd(e) {
     wishBtn.textContent = 'Remove from Wishlist';
   }
 
-  saveToLS('wishlist',wish);
+  saveToLS('wishlist', wish);
   countWishlistItems(wish.length);
 }
 

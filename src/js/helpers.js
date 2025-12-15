@@ -70,4 +70,4 @@ export function canLoadMore(totalItems) {
 export function hideLoadMore() {
   refs.loadMoreBtn.classList.add('is-hidden');
 }
-//Card//
+

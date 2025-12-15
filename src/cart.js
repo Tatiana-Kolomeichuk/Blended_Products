@@ -23,13 +23,8 @@ refs.productsList.addEventListener("click", handleItemClick);
 
 refs.buyBtnCart.addEventListener("click", handleBuyBtnClick);
 
-// ----------------- МОДАЛКА -----------------
+document.addEventListener('DOMContentLoaded', handleCartItemsLoad)
 
-// // Закрити по хрестику
-// refs.modalCloseBtn.addEventListener("click", handleBtnClose);
-
-// // Закрити по бекдропу
-// refs.modal.addEventListener("click", closeModal);
 
 
 // Клік по кнопці Buy у модалці (купити один товар)
@@ -38,6 +33,3 @@ refs.modal.addEventListener("click", handleItemClick);
 // ----------------- ПОШУК З КОШИКА -----------------
 
 refs.searchForm.addEventListener("submit", handleBtnSearch);
-
-  //Завантажуємо товари кошика
-  handleCartItemsLoad();

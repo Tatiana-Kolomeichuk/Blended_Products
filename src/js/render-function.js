@@ -23,6 +23,7 @@ export async function renderProducts(products) {
     .join('');
   refs.productsList.insertAdjacentHTML('beforeEnd', markup);
 }
+
 export function renderCategories(categories) {
   const categoryList = ['All', ...categories];
   const markup = categoryList
@@ -78,4 +79,20 @@ export function renderCardWishlist(items) {
     };
     
     refs.cartSummaryPrice.textContent = total.toFixed(2);
+}
+
+
+export function productTemplate({id, thumbnail, description, title, brand, category, price}) {
+    return `<li class="products__item" data-id="${id}">
+    <img class="products__image" src="${thumbnail}" alt="${description}"/>
+    <p class="products__title">${title}</p>
+    <p class="products__brand"><span class="products__brand--bold">Brand: ${brand}</span></p>
+    <p class="products__category">Category: ${category}</p>
+    <p class="products__price">Price: ${price}$</p>
+ </li>
+`
+}
+
+export function productsTemplate(products) {
+    return products.map(productTemplate).join('');
 }
