@@ -167,19 +167,19 @@ export async function handleItemClick(e) {
     openModal();
 
     // текст кнопок у модалці
-    if (cartItems.includes(id)) {
+    if (CART_KEY.includes(id)) {
       refs.addToCartModalBtn.textContent = 'Remove from cart';
     } else {
       refs.addToCartModalBtn.textContent = 'Add to cart';
     }
 
-    if (wishlistItems.includes(id)) {
+    if (WISHLIST_KEY.includes(id)) {
       refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
     } else {
       refs.addTowishlistBtn.textContent = 'Add to Wishlist';
     }
 
-    onEscapePress();
+    window.addEventListener('keydown', onEscapePress);
   } catch (error) {
     console.error('Error opening product modal:', error);
   }
@@ -193,7 +193,7 @@ export function handleBtnClose() {
 
 //------------------ ADD TO CART -------------------------------
 export function handleModalBtnAdd(e) {
-  if (productId === null) return; // ⬅️ захист
+  if (productId === null) return; 
 
   let raw = loadFromLS('cartItems') || [];
   const btn = e.target;
@@ -256,4 +256,24 @@ export function handleBuyItemClick(e) {
 
     saveToLS('cartItems', cartItems);
     handleCartItemsLoad();
+}
+
+//!==================== WISHLIST PAGE =================================
+
+//----------------- LOAD WISHLIST PAGE -------------------------
+export async function handleWishlistLoad(e) {
+    wishlistItems = loadFromLS('wishlist') || [];
+    initTheme();
+
+    try {
+        const response = wishlistItems.map(id => getProductById(id));
+        const result = await Promise.all(response);
+        const markup = productsTemplate(result);
+        refs.wishlistProductList.innerHTML = markup;
+        
+        countWishlistItems();
+        countCartItems();
+    } catch (error) {
+        console.log(error);
+    }
 }

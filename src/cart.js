@@ -5,6 +5,8 @@ import {
   handleBuyBtnClick,
   handleCartItemsLoad,
   handleItemClick,
+  handleModalBtnAdd,
+  handleWishlistAdd,
 
 } from "./js/handlers";
 import { toggleTheme } from "./js/helpers";
@@ -18,6 +20,11 @@ import { refs } from "./js/refs";
 
 // // ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
 refs.productsList.addEventListener("click", handleItemClick);
+
+//тут при додаванні чи видаленні товару у самій корзині, ще додатково викликаємо завантаження сторінки
+//щоб товар на фоні модалки відмальовувався правильно
+refs.addToCartModalBtn.addEventListener('click', handleCartItemsLoad);
+
 
 // // ----------------- ПОКУПКА ВСІХ ТОВАРІВ -----------------
 
@@ -36,7 +43,7 @@ refs.searchForm.addEventListener("submit", handleBtnSearch);
 document.addEventListener('DOMContentLoaded', handleCartItemsLoad)
 
 // ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
-refs.cartProductList.addEventListener('click', handleItemClick);
+refs.productsList.addEventListener('click', handleItemClick);
  //ПЕРЕМИКАННЯ ТЕМИ
 refs.themeToggleBtn.addEventListener('click', toggleTheme);
 

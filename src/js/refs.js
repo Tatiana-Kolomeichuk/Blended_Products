@@ -5,6 +5,7 @@ export const refs = {
   searchForm: document.querySelector('.search-form'),
   categoriesList: document.querySelector('.categories'),
   productsList: document.querySelector('.products'),
+  wishlistProductList: document.querySelector('.products-wish'),
 
   // --------- Кошик ---------
   buyBtnCart: document.querySelector('.cart-summary__btn'),
