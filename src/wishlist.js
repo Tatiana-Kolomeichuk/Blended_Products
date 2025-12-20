@@ -1,29 +1,31 @@
 //Логіка сторінки Wishlist
 
-import {  handleBtnClose, handleBtnSearch, handleItemClick, handleModalBtnAdd, handleWishlistAdd, handleWishlistLoad } from "./js/handlers";
-import { toggleTheme } from "./js/helpers";
+import {  handleModalBtnAdd, handleSearchForm, handleWishlistAdd, handleWishlistLoad, onProductClick } from "./js/handlers";
+import { initTheme, toggleTheme } from "./js/helpers";
 import { closeModal } from "./js/modal";
 import { refs } from "./js/refs";
 
 
 
-document.addEventListener('DOMContentLoaded', handleWishlistLoad);
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  handleWishlistLoad();
+});
 
-//на ту саму кнопку додаємо перезагрузку сторінки, щоб відмалювались актуальні продукти зі сховища
-refs.addTowishlistBtn.addEventListener('click', handleWishlistLoad);
-
-//МОДАЛКА
-//ці події на всіх сторінках одинакові
-//оскільки на всіх сторінках модальне вікно товару і дії в ньому одинакові
-refs.productsList.addEventListener('click', handleItemClick);
-refs.modalCloseBtn.addEventListener('click', handleBtnClose);
-refs. modalCloseBtn.addEventListener('click', closeModal);
-refs.addToCartModalBtn.addEventListener('click', handleModalBtnAdd);
-refs.addTowishlistBtn.addEventListener('click', handleWishlistAdd);
-//ПЕРЕМИКАННЯ ТЕМА
+refs.modalCloseBtn.addEventListener('click', closeModal);
+refs.productsList.addEventListener('click', onProductClick);
+refs.searchForm.addEventListener('submit', handleSearchForm);
 refs.themeToggleBtn.addEventListener('click', toggleTheme);
-//
 
-//ПОШУК З КОШИКА
-//робимо подію для пошуку і перекидання на головну сторінку
-refs.searchForm.addEventListener('submit', handleBtnSearch);
+// Кнопка ADD TO CART / REMOVE FROM CART в модалці
+refs.addToCartModalBtn.addEventListener('click', handleModalBtnAdd);
+
+// Кнопка ADD TO WISHLIST / REMOVE FROM WISHLIST в модалці
+refs.addTowishlistBtn.addEventListener('click', handleWishlistAdd);
+
+// ✅ Buy у модалці (а не handleItemClick!)
+refs.modal.addEventListener('click', (e) => {
+  if (e.target.closest('.modal-product__buy-btn')) {
+    handleBuyItemClick(e);
+  }
+});

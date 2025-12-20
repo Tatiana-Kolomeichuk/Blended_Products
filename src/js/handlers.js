@@ -165,15 +165,16 @@ export async function handleItemClick(e) {
     const product = await getProductById(id);
     renderModalProduct(product);
     openModal();
-
+const cartIds = loadFromLS(CART_KEY) || [];
+const wishIds = loadFromLS(WISHLIST_KEY) || [];
     // текст кнопок у модалці
-    if (CART_KEY.includes(id)) {
+    if (cartIds.includes(id)) {
       refs.addToCartModalBtn.textContent = 'Remove from cart';
     } else {
       refs.addToCartModalBtn.textContent = 'Add to cart';
     }
 
-    if (WISHLIST_KEY.includes(id)) {
+    if (wishIds.includes(id)) {
       refs.addTowishlistBtn.textContent = 'Remove from Wishlist';
     } else {
       refs.addTowishlistBtn.textContent = 'Add to Wishlist';

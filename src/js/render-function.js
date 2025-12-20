@@ -39,7 +39,7 @@ export function renderCategories(categories) {
 export function renderModalProduct(product) {
 
   const {
-    id,                       // ← додано!
+    id,                       
     images,
     title,
     description,
@@ -51,7 +51,7 @@ export function renderModalProduct(product) {
 
   const markup = `
       <img class="modal-product__img" src="${images[0]}" alt="${title}" />
-     <div class="modal-product__content data-id="${id}">
+     <div class="modal-product__content" data-id="${id}">
         <p class="modal-product__title">${title}</p>
         <ul class="modal-product__tags">${tags}</ul>
         <p class="modal-product__description">${description}</p>

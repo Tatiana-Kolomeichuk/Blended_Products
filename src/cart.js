@@ -4,53 +4,39 @@ import {
   handleBtnSearch,
   handleBuyBtnClick,
   handleCartItemsLoad,
+  handleCategoryClick,
   handleItemClick,
   handleModalBtnAdd,
+  handleSearchForm,
   handleWishlistAdd,
+  onProductClick,
 
 } from "./js/handlers";
-import { toggleTheme } from "./js/helpers";
+import { initTheme, toggleTheme } from "./js/helpers";
 
 import { closeModal } from "./js/modal";
 import { refs } from "./js/refs";
 
 
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+  handleCartItemsLoad();
+});
 
-
-
-// // ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
-refs.productsList.addEventListener("click", handleItemClick);
-
-//тут при додаванні чи видаленні товару у самій корзині, ще додатково викликаємо завантаження сторінки
-//щоб товар на фоні модалки відмальовувався правильно
-refs.addToCartModalBtn.addEventListener('click', handleCartItemsLoad);
-
-
-// // ----------------- ПОКУПКА ВСІХ ТОВАРІВ -----------------
-
-refs.buyBtnCart.addEventListener("click", handleBuyBtnClick);
-
-// // ------------------Закриття модалки-----------------------//
-refs. modalCloseBtn.addEventListener('click', closeModal);
-
-// // Клік по кнопці Buy у модалці (купити один товар)
- refs.modal.addEventListener("click", handleItemClick);
-
-// // ----------------- ПОШУК З КОШИКА -----------------
-
-refs.searchForm.addEventListener("submit", handleBtnSearch);
-//ЗАВАНТАЖЕННЯ СТОРІНКИ
-document.addEventListener('DOMContentLoaded', handleCartItemsLoad)
-
-// ВІДКРИВАЄМО МОДАЛКУ У КОШИКУ
-refs.productsList.addEventListener('click', handleItemClick);
- //ПЕРЕМИКАННЯ ТЕМИ
+refs.modalCloseBtn.addEventListener('click', closeModal);
+refs.productsList.addEventListener('click', onProductClick);
+refs.searchForm.addEventListener('submit', handleSearchForm);
 refs.themeToggleBtn.addEventListener('click', toggleTheme);
 
-
-
 // Кнопка ADD TO CART / REMOVE FROM CART в модалці
-refs.addToCartModalBtn.addEventListener("click", handleModalBtnAdd);
+refs.addToCartModalBtn.addEventListener('click', handleModalBtnAdd);
 
 // Кнопка ADD TO WISHLIST / REMOVE FROM WISHLIST в модалці
-refs.addTowishlistBtn.addEventListener("click", handleWishlistAdd);
+refs.addTowishlistBtn.addEventListener('click', handleWishlistAdd);
+
+// Buy у модалці 
+refs.modal.addEventListener('click', (e) => {
+  if (e.target.closest('.modal-product__buy-btn')) {
+    handleBuyItemClick(e);
+  }
+});
