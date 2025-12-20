@@ -7,7 +7,7 @@
 
 ## 🔗 Demo
 
-- GitHub Pages: *(додайте посилання після деплою)*
+- GitHub Pages: https://tatiana-kolomeichuk.github.io/Blended_Products/
 
 ---
 
